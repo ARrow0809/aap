@@ -70,7 +70,7 @@ function App() {
   const [copiedId, setCopiedId] = useState(null)
   const [sortBy, setSortBy] = useState('timestamp')
   const [sortOrder, setSortOrder] = useState('desc')
-  const [showSortMenu, setShowSortMenu] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState('all')
 
   // ソート機能
   const sortItems = (items, sortBy, sortOrder) => {
@@ -96,16 +96,13 @@ function App() {
     })
   }
 
-  // ソート条件変更時の処理
-  const handleSort = (newSortBy) => {
-    const newSortOrder = sortBy === newSortBy && sortOrder === 'desc' ? 'asc' : 'desc'
-    setSortBy(newSortBy)
-    setSortOrder(newSortOrder)
-    setShowSortMenu(false)
-  }
+  // カテゴリフィルタリング
+  const filteredItems = selectedCategory === 'all' 
+    ? portfolioItems 
+    : portfolioItems.filter(item => item.category === selectedCategory)
 
   // ソートされたアイテムを取得
-  const sortedItems = sortItems(portfolioItems, sortBy, sortOrder)
+  const sortedItems = sortItems(filteredItems, sortBy, sortOrder)
 
   // ナビゲーション機能
   const currentIndex = selectedItem ? sortedItems.findIndex(item => item.id === selectedItem.id) : -1
@@ -189,56 +186,53 @@ function App() {
           </motion.p>
         </div>
         
-        {/* ソートメニュー */}
+        {/* フィルター・ソートメニュー */}
         <div className="border-t border-slate-200 bg-white/90 backdrop-blur-sm">
           <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <span className="text-sm font-medium text-slate-700">並び替え:</span>
-                <div className="relative">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowSortMenu(!showSortMenu)}
-                    className="flex items-center gap-2"
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-4 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-slate-700">カテゴリ:</span>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="px-3 py-1 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
                   >
-                    <ArrowUpDown size={16} />
-                    {sortBy === 'timestamp' ? '日時' : 
-                     sortBy === 'category' ? 'カテゴリ' :
-                     sortBy === 'model' ? 'モデル' : 'タイトル'}
-                    <span className="text-xs">
-                      ({sortOrder === 'asc' ? '昇順' : '降順'})
-                    </span>
-                    <ChevronDown size={16} />
-                  </Button>
-                  
-                  {showSortMenu && (
-                    <div className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-md shadow-lg z-10 min-w-[200px]">
-                      {[
-                        { key: 'timestamp', label: '日時' },
-                        { key: 'category', label: 'カテゴリ' },
-                        { key: 'model', label: 'モデル' },
-                        { key: 'title', label: 'タイトル' }
-                      ].map((option) => (
-                        <button
-                          key={option.key}
-                          onClick={() => handleSort(option.key)}
-                          className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center justify-between ${
-                            sortBy === option.key ? 'bg-slate-100 font-medium' : ''
-                          }`}
-                        >
-                          <span>{option.label}</span>
-                          {sortBy === option.key && (
-                            <span className="text-xs text-slate-500">
-                              {sortOrder === 'asc' ? '昇順' : '降順'}
-                            </span>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                    <option value="all">すべて</option>
+                    <option value="Stable Diffusion">Stable Diffusion</option>
+                    <option value="Midjourney">Midjourney</option>
+                    <option value="Image Prompt">Image Prompt</option>
+                    <option value="YAML">YAML</option>
+                    <option value="Generated">Generated</option>
+                  </select>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-slate-700">並び替え:</span>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="px-3 py-1 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  >
+                    <option value="timestamp">日付</option>
+                    <option value="time">時間</option>
+                    <option value="model">プロンプトモデル</option>
+                  </select>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-slate-700">順序:</span>
+                  <select
+                    value={sortOrder}
+                    onChange={(e) => setSortOrder(e.target.value)}
+                    className="px-3 py-1 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  >
+                    <option value="desc">降順</option>
+                    <option value="asc">昇順</option>
+                  </select>
                 </div>
               </div>
+              
               <div className="text-sm text-slate-500">
                 {sortedItems.length} 件の作品
               </div>
@@ -276,8 +270,7 @@ function App() {
                 <Eye className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={32} />
               </div>
               <div className="p-4">
-                <h3 className="font-semibold text-slate-800 truncate">{item.title}</h3>
-                <p className="text-sm text-slate-500 mt-1">{item.category}</p>
+                <p className="text-sm font-medium text-slate-800">{item.category}</p>
                 <div className="text-xs text-slate-400 mt-1">
                   {item.date} {item.time}
                 </div>
@@ -339,7 +332,7 @@ function App() {
                 <div className="lg:w-1/2 p-6 flex flex-col">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h2 className="text-2xl font-bold text-slate-800">{selectedItem.title}</h2>
+                      <h2 className="text-2xl font-bold text-slate-800">{selectedItem.category}</h2>
                       <div className="text-sm text-slate-500 mt-1">
                         {selectedItem.date} {selectedItem.time} | {selectedItem.model}
                       </div>

@@ -1,0 +1,99 @@
+- name: |-
+    Here are relevant comma-separated English keywords for image generation:
+
+    Japanese miko
+  japanese_name: 巫女
+  category: テキスト入力
+  is_locked: false
+- name: shrine maiden
+  japanese_name: 巫女
+  category: テキスト入力
+  is_locked: false
+- name: high school girl
+  japanese_name: 女子高生
+  category: テキスト入力
+  is_locked: false
+- name: riding a dragon
+  japanese_name: 竜に乗る
+  category: テキスト入力
+  is_locked: false
+- name: silver dragon
+  japanese_name: 銀竜
+  category: テキスト入力
+  is_locked: false
+- name: Japanese dragon
+  japanese_name: 日本の竜
+  category: テキスト入力
+  is_locked: false
+- name: flying in the sky
+  japanese_name: 空を飛ぶ
+  category: テキスト入力
+  is_locked: false
+- name: long black hair
+  japanese_name: 長い黒髪
+  category: テキスト入力
+  is_locked: false
+- name: hair tied back with white cord
+  japanese_name: 白い紐で結ばれた髪
+  category: テキスト入力
+  is_locked: false
+- name: simple hairstyle
+  japanese_name: シンプルな髪型
+  category: テキスト入力
+  is_locked: false
+- name: white kimono robe
+  japanese_name: 白い着物
+  category: テキスト入力
+  is_locked: false
+- name: red hakama
+  japanese_name: 赤い袴
+  category: テキスト入力
+  is_locked: false
+- name: traditional miko outfit
+  japanese_name: 巫女服
+  category: テキスト入力
+  is_locked: false
+- name: melancholy expression
+  japanese_name: 物憂げな表情
+  category: テキスト入力
+  is_locked: false
+- name: pensive
+  japanese_name: 物思いにふける
+  category: テキスト入力
+  is_locked: false
+- name: sharp eyes
+  japanese_name: 鋭い目
+  category: テキスト入力
+  is_locked: false
+- name: focused gaze
+  japanese_name: 集中した視線
+  category: テキスト入力
+  is_locked: false
+- name: "(optional: cheerful expression"
+  japanese_name: 朗らかな表情
+  category: テキスト入力
+  is_locked: false
+- name: confident look)
+  japanese_name: 自信に満ちた表情
+  category: テキスト入力
+  is_locked: false
+- name: anime style
+  japanese_name: アニメ風
+  category: テキスト入力
+  is_locked: false
+- name: fantasy illustration
+  japanese_name: ファンタジーイラスト
+  category: テキスト入力
+  is_locked: false
+- name: full body
+  japanese_name: 全身
+  category: テキスト入力
+  is_locked: false
+- name: sky background
+  japanese_name: 空背景
+  category: テキスト入力
+  is_locked: false
+- name: clouds.
+  japanese_name: 雲
+  category: テキスト入力
+  is_locked: false

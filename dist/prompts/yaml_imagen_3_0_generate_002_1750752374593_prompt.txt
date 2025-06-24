@@ -1,0 +1,104 @@
+- name: AI influencer
+  japanese_name: AIインフルエンサー
+  category: テキスト入力
+  is_locked: false
+- name: digital human
+  japanese_name: デジタルヒューマン
+  category: テキスト入力
+  is_locked: false
+- name: virtual being
+  japanese_name: バーチャルビーイング
+  category: テキスト入力
+  is_locked: false
+- name: beautiful face
+  japanese_name: 美しい顔
+  category: テキスト入力
+  is_locked: false
+- name: stunning beauty
+  japanese_name: 息をのむ美しさ
+  category: テキスト入力
+  is_locked: false
+- name: perfect features
+  japanese_name: 完璧な顔立ち
+  category: テキスト入力
+  is_locked: false
+- name: flawless
+  japanese_name: 完璧
+  category: テキスト入力
+  is_locked: false
+- name: exquisite
+  japanese_name: 絶妙
+  category: テキスト入力
+  is_locked: false
+- name: smooth skin
+  japanese_name: 滑らかな肌
+  category: テキスト入力
+  is_locked: false
+- name: porcelain skin
+  japanese_name: 陶器のような肌
+  category: テキスト入力
+  is_locked: false
+- name: deep eyes
+  japanese_name: 奥行きのある瞳
+  category: テキスト入力
+  is_locked: false
+- name: glowing eyes
+  japanese_name: 輝く瞳
+  category: テキスト入力
+  is_locked: false
+- name: luminous eyes
+  japanese_name: 光を放つ瞳
+  category: テキスト入力
+  is_locked: false
+- name: unique eye color
+  japanese_name: ユニークな瞳の色
+  category: テキスト入力
+  is_locked: false
+- name: ethereal
+  japanese_name: 幽玄
+  category: テキスト入力
+  is_locked: false
+- name: otherworldly charm
+  japanese_name: 超越的な魅力
+  category: テキスト入力
+  is_locked: false
+- name: futuristic fashion
+  japanese_name: 未来的なファッション
+  category: テキスト入力
+  is_locked: false
+- name: digital clothing
+  japanese_name: デジタル衣料
+  category: テキスト入力
+  is_locked: false
+- name: unique textures
+  japanese_name: ユニークなテクスチャ
+  category: テキスト入力
+  is_locked: false
+- name: unrealistic materials
+  japanese_name: 非現実的な素材
+  category: テキスト入力
+  is_locked: false
+- name: sleek design
+  japanese_name: 洗練されたデザイン
+  category: テキスト入力
+  is_locked: false
+- name: high fashion
+  japanese_name: ハイファッション
+  category: テキスト入力
+  is_locked: false
+- name: avant-garde
+  japanese_name: アバンギャルド
+  category: テキスト入力
+  is_locked: false
+- name: digital background
+  japanese_name: デジタル背景
+  category: テキスト入力
+  is_locked: false
+- name: cyber atmosphere
+  japanese_name: サイバーな雰囲気
+  category: テキスト入力
+  is_locked: false
+- name: blend of reality and digital.
+  japanese_name: 現実とデジタルの融合
+  category: テキスト入力
+  is_locked: false

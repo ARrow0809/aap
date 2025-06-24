@@ -1,0 +1,48 @@
+- name: Japanese person
+  japanese_name: 日本人
+  category: テキスト入力
+  is_locked: false
+- name: 1girl
+  japanese_name: 一人
+  category: テキスト入力
+  is_locked: false
+- name: young adult
+  japanese_name: 若い
+  category: テキスト入力
+  is_locked: false
+- name: long hair
+  japanese_name: 長髪
+  category: テキスト入力
+  is_locked: false
+- name: dark hair
+  japanese_name: 黒髪
+  category: テキスト入力
+  is_locked: false
+- name: bangs
+  japanese_name: 前髪
+  category: テキスト入力
+  is_locked: false
+- name: face close-up
+  japanese_name: 顔アップ
+  category: テキスト入力
+  is_locked: false
+- name: blush
+  japanese_name: チーク
+  category: テキスト入力
+  is_locked: false
+- name: lip gloss
+  japanese_name: リップグロス
+  category: テキスト入力
+  is_locked: false
+- name: hair ornament
+  japanese_name: 髪飾り
+  category: テキスト入力
+  is_locked: false
+- name: solo
+  japanese_name: ソロ
+  category: テキスト入力
+  is_locked: false
+- name: realistic
+  japanese_name: リアル
+  category: テキスト入力
+  is_locked: false
