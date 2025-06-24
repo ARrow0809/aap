@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Copy, X, Eye } from 'lucide-react'
+import { Copy, X, Eye, ChevronDown, ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from './components/ui/Button.jsx'
 import './App.css'
 
@@ -41,24 +41,92 @@ const generatePortfolioData = () => {
     'yaml_imagen_3_0_generate_002_1750753171964.jpg'
   ]
 
-  return imageFiles.map((filename, index) => ({
-    id: `image-${index}`,
-    image: `/images/${filename}`,
-    promptFile: filename.replace('.jpg', '_prompt.txt'),
-    title: `AI Generated Art ${index + 1}`,
-    category: filename.includes('midjourney') ? 'Midjourney' : 
-              filename.includes('stableDiffusion') ? 'Stable Diffusion' :
-              filename.includes('imagePrompt') ? 'Image Prompt' :
-              filename.includes('yaml') ? 'YAML' : 'Generated'
-  }))
+  return imageFiles.map((filename, index) => {
+    const timestamp = filename.match(/(\d{13})/)?.[1] || '0'
+    const date = new Date(parseInt(timestamp))
+    
+    return {
+      id: `image-${index}`,
+      image: `/images/${filename}`,
+      promptFile: filename.replace('.jpg', '_prompt.txt'),
+      title: `AI Generated Art ${index + 1}`,
+      category: filename.includes('midjourney') ? 'Midjourney' : 
+                filename.includes('stableDiffusion') ? 'Stable Diffusion' :
+                filename.includes('imagePrompt') ? 'Image Prompt' :
+                filename.includes('yaml') ? 'YAML' : 'Generated',
+      date: date.toLocaleDateString('ja-JP'),
+      time: date.toLocaleTimeString('ja-JP'),
+      timestamp: parseInt(timestamp),
+      model: filename.includes('imagen_3_0') ? 'Imagen 3.0' : 'Default'
+    }
+  })
 }
 
 function App() {
-  const [portfolioItems] = useState(generatePortfolioData())
+  const [portfolioItems, setPortfolioItems] = useState(generatePortfolioData())
   const [selectedItem, setSelectedItem] = useState(null)
   const [promptText, setPromptText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [copiedId, setCopiedId] = useState(null)
+  const [sortBy, setSortBy] = useState('timestamp')
+  const [sortOrder, setSortOrder] = useState('desc')
+  const [showSortMenu, setShowSortMenu] = useState(false)
+
+  // ソート機能
+  const sortItems = (items, sortBy, sortOrder) => {
+    return [...items].sort((a, b) => {
+      let aValue = a[sortBy]
+      let bValue = b[sortBy]
+      
+      if (sortBy === 'timestamp') {
+        aValue = a.timestamp
+        bValue = b.timestamp
+      }
+      
+      if (typeof aValue === 'string') {
+        aValue = aValue.toLowerCase()
+        bValue = bValue.toLowerCase()
+      }
+      
+      if (sortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1
+      } else {
+        return aValue < bValue ? 1 : -1
+      }
+    })
+  }
+
+  // ソート条件変更時の処理
+  const handleSort = (newSortBy) => {
+    const newSortOrder = sortBy === newSortBy && sortOrder === 'desc' ? 'asc' : 'desc'
+    setSortBy(newSortBy)
+    setSortOrder(newSortOrder)
+    setShowSortMenu(false)
+  }
+
+  // ソートされたアイテムを取得
+  const sortedItems = sortItems(portfolioItems, sortBy, sortOrder)
+
+  // ナビゲーション機能
+  const currentIndex = selectedItem ? sortedItems.findIndex(item => item.id === selectedItem.id) : -1
+  const canGoPrev = currentIndex > 0
+  const canGoNext = currentIndex < sortedItems.length - 1
+
+  const goToPrev = () => {
+    if (canGoPrev) {
+      const prevItem = sortedItems[currentIndex - 1]
+      setSelectedItem(prevItem)
+      loadPrompt(prevItem.promptFile)
+    }
+  }
+
+  const goToNext = () => {
+    if (canGoNext) {
+      const nextItem = sortedItems[currentIndex + 1]
+      setSelectedItem(nextItem)
+      loadPrompt(nextItem.promptFile)
+    }
+  }
 
   // プロンプトファイルを読み込む関数
   const loadPrompt = async (promptFile) => {
@@ -120,6 +188,63 @@ function App() {
             画像とプロンプトのポートフォリオ
           </motion.p>
         </div>
+        
+        {/* ソートメニュー */}
+        <div className="border-t border-slate-200 bg-white/90 backdrop-blur-sm">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <span className="text-sm font-medium text-slate-700">並び替え:</span>
+                <div className="relative">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowSortMenu(!showSortMenu)}
+                    className="flex items-center gap-2"
+                  >
+                    <ArrowUpDown size={16} />
+                    {sortBy === 'timestamp' ? '日時' : 
+                     sortBy === 'category' ? 'カテゴリ' :
+                     sortBy === 'model' ? 'モデル' : 'タイトル'}
+                    <span className="text-xs">
+                      ({sortOrder === 'asc' ? '昇順' : '降順'})
+                    </span>
+                    <ChevronDown size={16} />
+                  </Button>
+                  
+                  {showSortMenu && (
+                    <div className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-md shadow-lg z-10 min-w-[200px]">
+                      {[
+                        { key: 'timestamp', label: '日時' },
+                        { key: 'category', label: 'カテゴリ' },
+                        { key: 'model', label: 'モデル' },
+                        { key: 'title', label: 'タイトル' }
+                      ].map((option) => (
+                        <button
+                          key={option.key}
+                          onClick={() => handleSort(option.key)}
+                          className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center justify-between ${
+                            sortBy === option.key ? 'bg-slate-100 font-medium' : ''
+                          }`}
+                        >
+                          <span>{option.label}</span>
+                          {sortBy === option.key && (
+                            <span className="text-xs text-slate-500">
+                              {sortOrder === 'asc' ? '昇順' : '降順'}
+                            </span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="text-sm text-slate-500">
+                {sortedItems.length} 件の作品
+              </div>
+            </div>
+          </div>
+        </div>
       </header>
 
       {/* メインコンテンツ */}
@@ -130,7 +255,7 @@ function App() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          {portfolioItems.map((item, index) => (
+          {sortedItems.map((item, index) => (
             <motion.div
               key={item.id}
               className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer"
@@ -153,6 +278,9 @@ function App() {
               <div className="p-4">
                 <h3 className="font-semibold text-slate-800 truncate">{item.title}</h3>
                 <p className="text-sm text-slate-500 mt-1">{item.category}</p>
+                <div className="text-xs text-slate-400 mt-1">
+                  {item.date} {item.time}
+                </div>
               </div>
             </motion.div>
           ))}
@@ -189,15 +317,43 @@ function App() {
                 {/* プロンプト部分 */}
                 <div className="lg:w-1/2 p-6 flex flex-col">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-2xl font-bold text-slate-800">{selectedItem.title}</h2>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={closeModal}
-                      className="text-slate-500 hover:text-slate-700"
-                    >
-                      <X size={20} />
-                    </Button>
+                    <div>
+                      <h2 className="text-2xl font-bold text-slate-800">{selectedItem.title}</h2>
+                      <div className="text-sm text-slate-500 mt-1">
+                        {selectedItem.date} {selectedItem.time} | {selectedItem.model}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={goToPrev}
+                        disabled={!canGoPrev}
+                        className="text-slate-500 hover:text-slate-700 disabled:opacity-30"
+                      >
+                        <ChevronLeft size={20} />
+                      </Button>
+                      <span className="text-sm text-slate-500 px-2">
+                        {currentIndex + 1} / {sortedItems.length}
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={goToNext}
+                        disabled={!canGoNext}
+                        className="text-slate-500 hover:text-slate-700 disabled:opacity-30"
+                      >
+                        <ChevronRight size={20} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={closeModal}
+                        className="text-slate-500 hover:text-slate-700 ml-2"
+                      >
+                        <X size={20} />
+                      </Button>
+                    </div>
                   </div>
                   
                   <div className="flex-1 overflow-auto">
