@@ -1,0 +1,5 @@
+はい、承知いたしました。提供された日本語のパラグラフから、キー要素を抽出し、英語の画像プロンプト（コンマ区切りキーワード）を生成します。スタイル指定は「photorealistic」です。
+
+**英語画像プロンプト:**
+
+photorealistic photo, dslr quality, young Japanese office lady, candid moment, slumped in office chair, relaxed posture, legs wide apart, black tight skirt (slightly pulled up), white button-down shirt, hint of white fabric visible under skirt, modern office background, messy desk, soft afternoon sunlight from window, natural light, gentle shadows, slightly dishevelled hair, relaxed expression, medium shot, eye-level perspective, extreme detail, sharp focus, realistic skin texture, detailed fabric texture, subtle bokeh background, shallow depth of field, intimate atmosphere

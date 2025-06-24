@@ -1,0 +1,88 @@
+- name: Japanese high school girl
+  japanese_name: 女子高生
+  category: テキスト入力
+  is_locked: false
+- name: wavy black hair
+  japanese_name: ウェーブのかかった黒髪
+  category: テキスト入力
+  is_locked: false
+- name: ponytail
+  japanese_name: ポニーテール
+  category: テキスト入力
+  is_locked: false
+- name: bangs with hairpins
+  japanese_name: 前髪ピン
+  category: テキスト入力
+  is_locked: false
+- name: large eyes
+  japanese_name: 大きな目
+  category: テキスト入力
+  is_locked: false
+- name: curious expression
+  japanese_name: 興味深そうな表情
+  category: テキスト入力
+  is_locked: false
+- name: thoughtful
+  japanese_name: 考え込んでいる
+  category: テキスト入力
+  is_locked: false
+- name: introspective
+  japanese_name: 内省的
+  category: テキスト入力
+  is_locked: false
+- name: reading
+  japanese_name: 読書
+  category: テキスト入力
+  is_locked: false
+- name: listening to music
+  japanese_name: 音楽を聴いている
+  category: テキスト入力
+  is_locked: false
+- name: headphones
+  japanese_name: ヘッドホン
+  category: テキスト入力
+  is_locked: false
+- name: wearing Japanese school uniform
+  japanese_name: 制服を着ている
+  category: テキスト入力
+  is_locked: false
+- name: personalized uniform accessories
+  japanese_name: 制服アレンジ
+  category: テキスト入力
+  is_locked: false
+- name: oversized cardigan
+  japanese_name: オーバーサイズのカーディガン
+  category: テキスト入力
+  is_locked: false
+- name: casual clothes
+  japanese_name: 私服
+  category: テキスト入力
+  is_locked: false
+- name: band t-shirt
+  japanese_name: バンドTシャツ
+  category: テキスト入力
+  is_locked: false
+- name: hoodie
+  japanese_name: パーカー
+  category: テキスト入力
+  is_locked: false
+- name: jeans
+  japanese_name: ジーンズ
+  category: テキスト入力
+  is_locked: false
+- name: sneakers
+  japanese_name: スニーカー
+  category: テキスト入力
+  is_locked: false
+- name: vintage dress
+  japanese_name: ヴィンテージドレス
+  category: テキスト入力
+  is_locked: false
+- name: shy
+  japanese_name: 内気
+  category: テキスト入力
+  is_locked: false
+- name: reserved.
+  japanese_name: 控えめ
+  category: テキスト入力
+  is_locked: false
