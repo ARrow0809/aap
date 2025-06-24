@@ -298,12 +298,33 @@ function App() {
             onClick={closeModal}
           >
             <motion.div
-              className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+              className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden relative"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
             >
+              {/* 左ナビゲーション */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={goToPrev}
+                disabled={!canGoPrev}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white disabled:opacity-30 rounded-full w-12 h-12 p-0"
+              >
+                <ChevronLeft size={24} />
+              </Button>
+              
+              {/* 右ナビゲーション */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={goToNext}
+                disabled={!canGoNext}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white disabled:opacity-30 rounded-full w-12 h-12 p-0"
+              >
+                <ChevronRight size={24} />
+              </Button>
               <div className="flex flex-col lg:flex-row">
                 {/* 画像部分 */}
                 <div className="lg:w-1/2">
@@ -324,32 +345,14 @@ function App() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={goToPrev}
-                        disabled={!canGoPrev}
-                        className="text-slate-500 hover:text-slate-700 disabled:opacity-30"
-                      >
-                        <ChevronLeft size={20} />
-                      </Button>
                       <span className="text-sm text-slate-500 px-2">
                         {currentIndex + 1} / {sortedItems.length}
                       </span>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={goToNext}
-                        disabled={!canGoNext}
-                        className="text-slate-500 hover:text-slate-700 disabled:opacity-30"
-                      >
-                        <ChevronRight size={20} />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
                         onClick={closeModal}
-                        className="text-slate-500 hover:text-slate-700 ml-2"
+                        className="text-slate-500 hover:text-slate-700"
                       >
                         <X size={20} />
                       </Button>
