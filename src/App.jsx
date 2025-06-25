@@ -4,6 +4,32 @@ import { Copy, X, Eye, ChevronDown, ArrowUpDown, ChevronLeft, ChevronRight } fro
 import { Button } from './components/ui/Button.jsx'
 import './App.css'
 
+// プロンプト内容に基づいてカテゴリを判定する関数
+const categorizeByPrompt = async (promptText) => {
+  // プロンプトがない場合はImagePrompt用プロンプト
+  if (!promptText || promptText.trim() === '' || promptText === 'プロンプトの読み込みに失敗しました。') {
+    return 'ImagePrompt用プロンプト'
+  }
+  
+  // プロンプト末尾が "--ar" または "--v" を含む → Midjourney用プロンプト
+  if (promptText.includes('--ar') || promptText.includes('--v')) {
+    return 'Midjourney用プロンプト'
+  }
+  
+  // プロンプト先頭が "masterpiece, best quality," → Stable Diffusion用プロンプト
+  if (promptText.trim().startsWith('masterpiece, best quality,')) {
+    return 'Stable Diffusion用プロンプト'
+  }
+  
+  // YAML階層に日本語項目が含まれる → Yaml code
+  if (promptText.includes('  ') && /[ひらがなカタカナ漢字]/.test(promptText)) {
+    return 'Yaml code'
+  }
+  
+  // 上記以外 → ImagePrompt用プロンプト
+  return 'ImagePrompt用プロンプト'
+}
+
 // 画像とプロンプトのデータを生成する関数
 const generatePortfolioData = () => {
   const imageFiles = [
@@ -78,10 +104,10 @@ const generatePortfolioData = () => {
       image: `/images/${filename}`,
       promptFile: filename.replace('.jpg', '_prompt.txt'),
       title: `AI Generated Art ${index + 1}`,
-      category: filename.includes('midjourney') ? 'Midjourney' : 
-                filename.includes('stableDiffusion') ? 'Stable Diffusion' :
-                filename.includes('imagePrompt') ? 'Image Prompt' :
-                filename.includes('yaml') ? 'YAML' : 'Generated',
+      category: filename.includes('midjourney') ? 'Midjourney用プロンプト' : 
+                filename.includes('stableDiffusion') ? 'Stable Diffusion用プロンプト' :
+                filename.includes('imagePrompt') ? 'ImagePrompt用プロンプト' :
+                filename.includes('yaml') ? 'Yaml code' : 'Generated',
       date: date.toLocaleDateString('ja-JP'),
       time: date.toLocaleTimeString('ja-JP'),
       timestamp: parseInt(timestamp),
@@ -99,6 +125,47 @@ function App() {
   const [sortBy, setSortBy] = useState('timestamp')
   const [sortOrder, setSortOrder] = useState('desc')
   const [selectedCategory, setSelectedCategory] = useState('all')
+  const [isAutoClassifying, setIsAutoClassifying] = useState(false)
+
+  // カテゴリごとの背景色を取得する関数
+  const getCategoryBackgroundColor = (category) => {
+    switch (category) {
+      case 'Midjourney用プロンプト':
+        return 'bg-[#A8D8EA]' // パステルブルー
+      case 'Stable Diffusion用プロンプト':
+        return 'bg-[#B6E2D3]' // パステルグリーン
+      case 'ImagePrompt用プロンプト':
+        return 'bg-[#FFF5BA]' // パステルイエロー
+      case 'Yaml code':
+        return 'bg-[#EAD7F6]' // パステルラベンダー
+      case 'Generated':
+        return 'bg-[#FFD1DC]' // パステルピンク（自動分類前）
+      default:
+        return 'bg-white'
+    }
+  }
+
+  // プロンプト内容に基づいてカテゴリを自動更新する関数
+  const updateCategoryByPrompt = async (item, promptText) => {
+    const newCategory = await categorizeByPrompt(promptText)
+    if (item.category === 'Generated') {
+      const updatedItems = portfolioItems.map(portfolioItem => 
+        portfolioItem.id === item.id 
+          ? { ...portfolioItem, category: newCategory }
+          : portfolioItem
+      )
+      setPortfolioItems(updatedItems)
+      if (selectedItem && selectedItem.id === item.id) {
+        setSelectedItem({ ...selectedItem, category: newCategory })
+      }
+    }
+  }
+
+  // 手動でカテゴリを更新する関数（一時的に無効化）
+  const updateCategoryManually = (item, newCategory) => {
+    // 一時的に無効化
+    return
+  }
 
   // ソート機能
   const sortItems = (items, sortBy, sortOrder) => {
@@ -132,6 +199,16 @@ function App() {
   // ソートされたアイテムを取得
   const sortedItems = sortItems(filteredItems, sortBy, sortOrder)
 
+  // Generatedカテゴリが存在するかチェック
+  const hasGeneratedItems = portfolioItems.some(item => item.category === 'Generated')
+
+  // Generatedカテゴリが選択されているが該当アイテムがない場合は「all」に変更
+  useEffect(() => {
+    if (selectedCategory === 'Generated' && !hasGeneratedItems) {
+      setSelectedCategory('all')
+    }
+  }, [hasGeneratedItems, selectedCategory])
+
   // ナビゲーション機能
   const currentIndex = selectedItem ? sortedItems.findIndex(item => item.id === selectedItem.id) : -1
   const canGoPrev = currentIndex > 0
@@ -153,6 +230,73 @@ function App() {
     }
   }
 
+  // ページ読み込み時に「Generated」カテゴリのアイテムを自動分類
+  useEffect(() => {
+    const autoClassifyGeneratedItems = async () => {
+      setIsAutoClassifying(true)
+      const generatedItems = portfolioItems.filter(item => item.category === 'Generated')
+      
+      for (const item of generatedItems) {
+        try {
+          const response = await fetch(`/prompts/${item.promptFile}`)
+          const text = await response.text()
+          const newCategory = await categorizeByPrompt(text)
+          
+          // カテゴリを更新
+          setPortfolioItems(prevItems => 
+            prevItems.map(portfolioItem => 
+              portfolioItem.id === item.id 
+                ? { ...portfolioItem, category: newCategory }
+                : portfolioItem
+            )
+          )
+          
+          // 少し待機してアニメーション効果を演出
+          await new Promise(resolve => setTimeout(resolve, 200))
+        } catch (error) {
+          console.error(`プロンプトの読み込みに失敗: ${item.promptFile}`, error)
+          // エラーの場合はImagePrompt用プロンプトに分類
+          setPortfolioItems(prevItems => 
+            prevItems.map(portfolioItem => 
+              portfolioItem.id === item.id 
+                ? { ...portfolioItem, category: 'ImagePrompt用プロンプト' }
+                : portfolioItem
+            )
+          )
+        }
+      }
+      
+      setIsAutoClassifying(false)
+    }
+
+    // 初回読み込み時のみ実行
+    const hasGeneratedItems = portfolioItems.some(item => item.category === 'Generated')
+    if (hasGeneratedItems) {
+      autoClassifyGeneratedItems()
+    }
+  }, []) // 空の依存配列で初回のみ実行
+
+  // キーボードナビゲーション
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (selectedItem) {
+        if (event.key === 'ArrowLeft') {
+          event.preventDefault()
+          goToPrev()
+        } else if (event.key === 'ArrowRight') {
+          event.preventDefault()
+          goToNext()
+        } else if (event.key === 'Escape') {
+          event.preventDefault()
+          closeModal()
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [selectedItem, currentIndex, canGoPrev, canGoNext])
+
   // プロンプトファイルを読み込む関数
   const loadPrompt = async (promptFile) => {
     setIsLoading(true)
@@ -160,9 +304,19 @@ function App() {
       const response = await fetch(`/prompts/${promptFile}`)
       const text = await response.text()
       setPromptText(text)
+      
+      // プロンプト内容に基づいてカテゴリを自動更新
+      if (selectedItem) {
+        await updateCategoryByPrompt(selectedItem, text)
+      }
     } catch (error) {
       console.error('プロンプトの読み込みに失敗しました:', error)
       setPromptText('プロンプトの読み込みに失敗しました。')
+      
+      // プロンプトが読み込めない場合はGeneratedのままにする
+      if (selectedItem && selectedItem.category === 'Generated') {
+        await updateCategoryByPrompt(selectedItem, '')
+      }
     } finally {
       setIsLoading(false)
     }
@@ -227,11 +381,17 @@ function App() {
                     className="px-3 py-1 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
                   >
                     <option value="all">すべて</option>
-                    <option value="Stable Diffusion">Stable Diffusion</option>
-                    <option value="Midjourney">Midjourney</option>
-                    <option value="Image Prompt">Image Prompt</option>
-                    <option value="YAML">YAML</option>
-                    <option value="Generated">Generated</option>
+                    <option value="Stable Diffusion用プロンプト">Stable Diffusion用プロンプト</option>
+                    <option value="Midjourney用プロンプト">Midjourney用プロンプト</option>
+                    <option value="ImagePrompt用プロンプト">ImagePrompt用プロンプト</option>
+                    <option value="Yaml code">Yaml code</option>
+                    <option 
+                      value="Generated" 
+                      disabled={!hasGeneratedItems}
+                      className={!hasGeneratedItems ? "text-gray-400" : ""}
+                    >
+                      Generated (自動分類待ち) {!hasGeneratedItems ? "(なし)" : ""}
+                    </option>
                   </select>
                 </div>
                 
@@ -263,6 +423,11 @@ function App() {
               
               <div className="text-sm text-slate-500">
                 {sortedItems.length} 件の作品
+                {isAutoClassifying && (
+                  <span className="ml-2 text-blue-600 font-medium">
+                    (自動分類中...)
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -280,10 +445,18 @@ function App() {
           {sortedItems.map((item, index) => (
             <motion.div
               key={item.id}
-              className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer"
+              className={`group relative ${getCategoryBackgroundColor(item.category)} rounded-xl shadow-md hover:shadow-xl transition-all duration-500 overflow-hidden cursor-pointer`}
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
+              animate={{ 
+                opacity: 1, 
+                y: 0,
+                scale: item.category === 'Generated' ? [1, 1.05, 1] : 1
+              }}
+              transition={{ 
+                duration: 0.6, 
+                delay: index * 0.1,
+                scale: { duration: 0.8, repeat: item.category === 'Generated' ? Infinity : 0, repeatDelay: 2 }
+              }}
               whileHover={{ y: -5 }}
               onClick={() => handleImageClick(item)}
             >
@@ -403,10 +576,29 @@ function App() {
                         </div>
                       )}
                     </div>
+                    
+                    {/* 手動カテゴリ選択UI（一時的に無効化）
+                    <div className="bg-slate-50 rounded-lg p-4 mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-semibold text-slate-700">カテゴリ設定</h3>
+                      </div>
+                      <select
+                        value={selectedItem.category}
+                        onChange={(e) => updateCategoryManually(selectedItem, e.target.value)}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+                      >
+                        <option value="Stable Diffusion用プロンプト">Stable Diffusion用プロンプト</option>
+                        <option value="Midjourney用プロンプト">Midjourney用プロンプト</option>
+                        <option value="ImagePrompt用プロンプト">ImagePrompt用プロンプト</option>
+                        <option value="Yaml code">Yaml code</option>
+                        <option value="Generated">Generated</option>
+                      </select>
+                    </div>
+                    */}
                   </div>
                   
                   <div className="text-sm text-slate-500">
-                    カテゴリ: {selectedItem.category}
+                    現在のカテゴリ: {selectedItem.category}
                   </div>
                 </div>
               </div>
